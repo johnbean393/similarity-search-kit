@@ -18,7 +18,12 @@ public class DistilbertEmbeddings: EmbeddingsProtocol {
 
     public init() {
         let modelConfig = MLModelConfiguration()
-        modelConfig.computeUnits = .all
+        // Use CPU & GPU only on macOS 14 to avoid ANE bugs
+        if #unavailable(macOS 15) {
+            modelConfig.computeUnits = .cpuAndGPU
+        } else {
+            modelConfig.computeUnits = .all
+        }
 
         do {
             self.model = try msmarco_distilbert_base_tas_b_512_single_quantized(configuration: modelConfig)
